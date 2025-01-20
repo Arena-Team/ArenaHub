@@ -232,6 +232,22 @@ task.spawn(function()
 	end
 end)
 
+local Golden = Section2:CreateLabel({
+	Title = ".."
+})
+
+task.spawn(function()
+	while task.wait() do
+		pcall(function()
+			if game.Workspace.zones.fishing:FindFirstChild("Golden Tide Pools") or game.Workspace.zones.fishing:FindFirstChild("Golden Tide Pools") then
+				Golden:Set("🪔 | Golden Tide Pools : 🟢")
+			else
+				Golden:Set("🪔 | Golden Tide Pools : ❌")
+			end
+		end)
+	end
+end)
+
 local Section2 = Tab1:CreateSection({
 	Title = "\\\\ Fisching Zone //",
 	Side = "Right"
@@ -352,6 +368,29 @@ local offset = Vector3.new(0, 50, 0)
                     end)
                 end)
 
+Section2:CreateToggle({
+Title = "Auto Find Golden Tide Pools",
+Value = false,
+Callback = function(Value)
+_G.AutoGoldenTidePools = Value
+end})
+
+       spawn(function()
+            pcall(function()
+                while wait() do
+                    if _G.AutoGoldenTidePools then
+                        for i,v in pairs(game.Workspace.zones.fishing:GetChildren()) do
+                            if game.Workspace.zones.fishing:FindFirstChild("Golden Tide Pools") then
+
+local offset = Vector3.new(0, 50, 0)
+                                    TP(CFrame.new(game.Workspace.zones.fishing["Megalodon"].Position + offset))
+                                    end
+                                end
+                            end
+                        end
+                    end)
+                end)
+
 local Section1 = Tab1:CreateSection({
 Title = "\\\\ Selling //",
 Side = "Left"
@@ -398,7 +437,7 @@ TP(CFrame.new(-2824.359, 214.311, 1518.130))
 end})
 
 Section3:CreateButton({
-Title = "Repair Map",
+Title = "Repair Treasure Map [🗺️]",
 Callback = function()
 for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
                 if v.Name == "Treasure Map" then
@@ -447,37 +486,13 @@ Title = "Auto Appraiser\nView [450C$]",
 Value = false,
 Callback = function(Value)
 _G.AutoAppraiser = Value
-end})
-
-task.spawn(function()
-    while task.wait(0.01) do
-        if _G.AutoAppraiser then
-            pcall(function()
-                        local player = game.Players.LocalPlayer
-
-        local character = player.Character or player.CharacterAdded:Wait()
-
-        local previousPosition = character.HumanoidRootPart.Position
-
-        local targetPosition = Vector3.new(441, 153, 210)
-
-        character:SetPrimaryPartCFrame(CFrame.new(targetPosition)) 
-
-        local appraiser = workspace:WaitForChild("world"):WaitForChild("npcs"):WaitForChild("Appraiser"):WaitForChild("appraiser"):WaitForChild("appraise")
-
-        appraiser:InvokeServer()
-
-        wait(0)
-
-        if tpslback == true then
-
-            character:SetPrimaryPartCFrame(CFrame.new(previousPosition))
-
-        end
-            end)
-        end
-    end
+spawn(function()
+while _G.AutoAppraiser == true do        
+wait()
+workspace.world.npcs.Appraiser.appraiser.appraise:InvokeServer()
+end
 end)
+end})
 
 local Section4 = Tab2:CreateSection({
 	Title = "\\\\ Money | Risk //",
