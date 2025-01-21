@@ -2378,7 +2378,7 @@ game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(p)
 end
 
 local Tap1 = Windown.CreateTap({
-Title = "Farming Tab",
+Title = "Farming",
 Icon = "15169955786"
 })
 
@@ -2777,3 +2777,52 @@ local offset = Vector3.new(0, 50, 0)
                     end)
                 end)
 
+
+local Tap2 = Windown.CreateTap({
+Title = "Sub Farming",
+Icon = "thermometer"
+})
+
+local Page3 = Tap2.CreatePage({
+Side = "Left"
+})
+
+Page3.CreateLable({
+Name = "Treasure"
+})
+
+Page3.CreateToggle({
+Name = "Auto Fully Treasure",
+Value = false,
+Dis = "Automatically keep treasure.",
+Callback = function(Value)
+_G.AutoCollectTreasure = Value
+spawn(function()
+    pcall(function()
+        while _G.AutoCollectTreasure do wait()
+for i,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do 
+                if v.Name == "Treasure Map" then
+                    game.Players.LocalPlayer.Character.Humanoid:EquipTool(v)
+                    workspace.world.npcs["Jack Marrow"].treasure.repairmap:InvokeServer()
+                end
+            end
+                      for i, v in ipairs(game:GetService("Workspace"):GetDescendants()) do
+                if v.ClassName == "ProximityPrompt" then
+                    v.HoldDuration = 0
+                end
+            end
+            for i, v in pairs(workspace.world.chests:GetDescendants()) do
+                if v:IsA("Part") and v:FindFirstChild("ChestSetup") then 
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                    for _, v in pairs(workspace.world.chests:GetDescendants()) do
+                        if v.Name == "ProximityPrompt" then
+                            fireproximityprompt(v)
+                        end
+                    end
+                    task.wait(1)
+                end 
+            end
+        end
+    end)
+end)
+end}, false)
