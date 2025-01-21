@@ -2531,6 +2531,34 @@ end
 end
 end)
 
+Page1.CreateLable({
+Name = "Selling"
+})
+
+Page1.CreateSlider({
+	Name = "Choose Delay Selling",
+	Min = 0,
+	Max = 600,
+	Value = 120,
+	Format = function(value)
+	end
+})
+
+Page1.CreateToggle({
+Name = "Enable Sell Fishing",
+Value = false,
+Dis = "Automatically selling fishing.",
+Callback = function(Value)
+_G.SellAll = Value
+spawn(function()
+while _G.SellAll == true do        
+wait()
+game:GetService("ReplicatedStorage").events.SellAll:InvokeServer()
+task.wait(_G.AutoSellDelay)
+end
+end)
+end}, false)
+
 local Page2 = Tap1.CreatePage({
 Side = "Right"
 })
