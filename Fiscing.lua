@@ -2511,7 +2511,7 @@ end)
 
 Page1.CreateToggle({
 Name = "Auto Equip Rod",
-Value = true,
+Value = false,
 Dis = "Automatically holding the rod.",
 Callback = function(Value)
 _G.AutoEquip = Value
