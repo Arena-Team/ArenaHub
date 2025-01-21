@@ -2792,7 +2792,7 @@ Name = "Treasure"
 })
 
 Page3.CreateToggle({
-Name = "Auto Fully Treasure",
+Name = "Auto Fully Treasure Map",
 Value = false,
 Dis = "Automatically keep treasure.",
 Callback = function(Value)
