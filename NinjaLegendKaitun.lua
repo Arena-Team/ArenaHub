@@ -261,103 +261,6 @@ if _G.Switch_Hub_Series_R then
 	 Three_World = true
 	 end
 	
-local env = (getgenv or getrenv or getfenv)()
-local rs = game:GetService("ReplicatedStorage")
-local players = game:GetService("Players")
-local client = players.LocalPlayer
-local modules = rs:WaitForChild("Modules")
-local net = modules:WaitForChild("Net")
-local charFolder = workspace:WaitForChild("Characters")
-local enemyFolder = workspace:WaitForChild("Enemies")
-
-local Module = {
-    AttackCooldown = tick()
-}
-local CachedChars = {}
-
-function Module.IsAlive(Char: Model?): boolean
-    if not Char then return nil end
-    if CachedChars[Char] then return CachedChars[Char].Health > 0 end
-
-    local Hum = Char:FindFirstChildOfClass("Humanoid")
-    CachedChars[Char] = Hum
-    return Hum and Hum.Health > 0
-end
-
-local Settings = {
-    ClickDelay = 0.01,
-    AutoClick = true
-}
-
-Module.FastAttack = (function()
-    if env._trash_attack then return env._trash_attack end
-
-    local AttackModule = {
-        NextAttack = 0,
-        Distance = 55,
-        attackMobs = true,
-        attackPlayers = true
-    }
-
-    local RegisterAttack = net:WaitForChild("RE/RegisterAttack")
-    local RegisterHit = net:WaitForChild("RE/RegisterHit")
-
-    function AttackModule:AttackEnemy(EnemyHead, Table)
-        if EnemyHead and client:DistanceFromCharacter(EnemyHead.Position) < self.Distance then
-            if not self.FirstAttack then
-                RegisterAttack:FireServer(Settings.ClickDelay or 0.125)
-                self.FirstAttack = true
-            end
-            RegisterHit:FireServer(EnemyHead, Table or {})
-        end
-    end
-
-    function AttackModule:AttackNearest()
-        local args = {nil, {}}
-        for _, Enemy in enemyFolder:GetChildren() do
-            if not args[1] and Enemy:FindFirstChild("HumanoidRootPart", true) and client:DistanceFromCharacter(Enemy.HumanoidRootPart.Position) < self.Distance then
-                args[1] = Enemy:FindFirstChild("UpperTorso")
-            elseif Enemy:FindFirstChild("HumanoidRootPart", true) and client:DistanceFromCharacter(Enemy.HumanoidRootPart.Position) < self.Distance then
-                table.insert(args[2], {
-                    [1] = Enemy,
-                    [2] = Enemy:FindFirstChild("UpperTorso")
-                })
-            end
-        end
-
-        self:AttackEnemy(unpack(args))
-
-        for _, Enemy in charFolder:GetChildren() do
-            if Enemy ~= client.Character then
-                self:AttackEnemy(Enemy:FindFirstChild("UpperTorso"))
-            end
-        end
-
-        if not self.FirstAttack then
-            task.wait(0.5)
-        end
-    end
-
-    function AttackModule:BladeHits()
-        self:AttackNearest()
-        self.FirstAttack = false
-    end
-
-    task.spawn(function()
-        while task.wait(Settings.ClickDelay or 0.125) do
-            if (tick() - Module.AttackCooldown) < 0.483 then continue end
-            if not Settings.AutoClick then continue end
-            if not Module.IsAlive(client.Character) then continue end
-            if not client.Character:FindFirstChildOfClass("Tool") then continue end
-
-            AttackModule:BladeHits()
-        end
-    end)
-
-    env._trash_attack = AttackModule
-    return AttackModule
-end)()
-	
 	 function ClickHide(v)
 		firesignal(v['Activated'])
 		firesignal(v['MouseButton1Click'])
@@ -3830,38 +3733,6 @@ end)()
 						until game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == true or not Auto_Farm_Kaitun
 					elseif CFrameQBoss == nil then
 						SelectBoss = nil
-					end
-				end
-			end
-			if Old_World and game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == false then
-				local Lv = game.Players.LocalPlayer.Data.Level.Value
-				if game.Players.LocalPlayer.Data.Level.Value >= 100 and game.Players.LocalPlayer.Data.Level.Value < 650 and #game.Players:GetPlayers() > 5 then
-					if string.find(tostring(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("PlayerHunter")),'We') then
-						if game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == true then
-							local at_time = 0
-							FarmPlayer = false
-							repeat wait()
-								local xp = game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text
-								result = {}
-								local regex = ("([^%s]+)"):format(" ")
-								for each in xp:gmatch(regex) do
-									table.insert(result, each)
-								end
-								if #result >= 2 then
-									if game.Players:FindFirstChild(result[2]) and game.Players[result[2]].Data.Level.Value >= 20 and game.Players[result[2]].Data.Level.Value <= game.Players.LocalPlayer.Data.Level.Value+200 then
-										FarmPlayer = true
-										at_time = 5
-									else
-										if string.find(tostring(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("PlayerHunter")),'We') then
-											at_time = at_time+1
-										end
-									end
-								end
-							until at_time >= 5
-							if not FarmPlayer and game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == true then
-								game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("AbandonQuest")
-							end
-						end
 					end
 				end
 			end
@@ -11052,3 +10923,100 @@ end)()
 			end)
 		end
 	end)
+
+	local env = (getgenv or getrenv or getfenv)()
+local rs = game:GetService("ReplicatedStorage")
+local players = game:GetService("Players")
+local client = players.LocalPlayer
+local modules = rs:WaitForChild("Modules")
+local net = modules:WaitForChild("Net")
+local charFolder = workspace:WaitForChild("Characters")
+local enemyFolder = workspace:WaitForChild("Enemies")
+
+local Module = {
+    AttackCooldown = tick()
+}
+local CachedChars = {}
+
+function Module.IsAlive(Char: Model?): boolean
+    if not Char then return nil end
+    if CachedChars[Char] then return CachedChars[Char].Health > 0 end
+
+    local Hum = Char:FindFirstChildOfClass("Humanoid")
+    CachedChars[Char] = Hum
+    return Hum and Hum.Health > 0
+end
+
+local Settings = {
+    ClickDelay = 0.01,
+    AutoClick = true
+}
+
+Module.FastAttack = (function()
+    if env._trash_attack then return env._trash_attack end
+
+    local AttackModule = {
+        NextAttack = 0,
+        Distance = 55,
+        attackMobs = true,
+        attackPlayers = true
+    }
+
+    local RegisterAttack = net:WaitForChild("RE/RegisterAttack")
+    local RegisterHit = net:WaitForChild("RE/RegisterHit")
+
+    function AttackModule:AttackEnemy(EnemyHead, Table)
+        if EnemyHead and client:DistanceFromCharacter(EnemyHead.Position) < self.Distance then
+            if not self.FirstAttack then
+                RegisterAttack:FireServer(Settings.ClickDelay or 0.125)
+                self.FirstAttack = true
+            end
+            RegisterHit:FireServer(EnemyHead, Table or {})
+        end
+    end
+
+    function AttackModule:AttackNearest()
+        local args = {nil, {}}
+        for _, Enemy in enemyFolder:GetChildren() do
+            if not args[1] and Enemy:FindFirstChild("HumanoidRootPart", true) and client:DistanceFromCharacter(Enemy.HumanoidRootPart.Position) < self.Distance then
+                args[1] = Enemy:FindFirstChild("UpperTorso")
+            elseif Enemy:FindFirstChild("HumanoidRootPart", true) and client:DistanceFromCharacter(Enemy.HumanoidRootPart.Position) < self.Distance then
+                table.insert(args[2], {
+                    [1] = Enemy,
+                    [2] = Enemy:FindFirstChild("UpperTorso")
+                })
+            end
+        end
+
+        self:AttackEnemy(unpack(args))
+
+        for _, Enemy in charFolder:GetChildren() do
+            if Enemy ~= client.Character then
+                self:AttackEnemy(Enemy:FindFirstChild("UpperTorso"))
+            end
+        end
+
+        if not self.FirstAttack then
+            task.wait(0.5)
+        end
+    end
+
+    function AttackModule:BladeHits()
+        self:AttackNearest()
+        self.FirstAttack = false
+    end
+
+    task.spawn(function()
+        while task.wait(Settings.ClickDelay or 0.125) do
+            if (tick() - Module.AttackCooldown) < 0.483 then continue end
+            if not Settings.AutoClick then continue end
+            if not Module.IsAlive(client.Character) then continue end
+            if not client.Character:FindFirstChildOfClass("Tool") then continue end
+
+            AttackModule:BladeHits()
+        end
+    end)
+
+    env._trash_attack = AttackModule
+    return AttackModule
+end)()
