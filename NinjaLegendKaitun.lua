@@ -3736,6 +3736,22 @@ if _G.Switch_Hub_Series_R then
 					end
 				end
 			end
+			if game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible == false then
+				local Lv = game.Players.LocalPlayer.Data.Level.Value
+				if game.Players.LocalPlayer.Data.Level.Value >= 10 and game.Players.LocalPlayer.Data.Level.Value <= 100 then
+					CheckLevel2()
+					game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text = NameMon
+					game.Players.LocalPlayer.PlayerGui.Main.Quest.Visible = true
+				else
+					CheckLevel2()
+					if not First_Quest then
+						if SelectMonster ~= nil then
+							First_Quest = true
+						end
+					else
+						SelectMonster = nil
+						First_Quest = false
+					end
 					repeat wait(.1)
 						TPX(CFrameQ)
 						if (CFrameQ.Position-game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 3 then
